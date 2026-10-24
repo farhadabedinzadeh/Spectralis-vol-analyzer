@@ -1,0 +1,20 @@
+# Raw imaging and private clinical exports
+*.vol
+*.e2e
+
+# Generated analysis files (keep only curated public figures in examples/)
+vol_outputs/
+**/vol_outputs/
+
+# Notebook / Python caches
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local environments and credentials
+.venv/
+venv/
+.env
+.env.*
+.DS_Store

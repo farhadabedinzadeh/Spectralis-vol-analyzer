@@ -1,0 +1,6 @@
+eyepy>=0.21
+numpy
+scipy
+scikit-image
+matplotlib
+imageio

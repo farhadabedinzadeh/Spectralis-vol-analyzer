@@ -6,7 +6,11 @@ The pipeline loads OCT volumes with [EyePy](https://github.com/MedVisBonn/eyepy)
 
 The main goal is to provide a **transparent, reproducible starting point for OCT research**, particularly for studies involving retinal morphology, macular thickness, longitudinal imaging, and myopia.
 
-**Repository status:** The Python implementation described below has not yet been added to this repository. The installation and usage examples will be runnable once `spectralis_vol_analyzer.py` is committed.
+**Code:** [spectralis_vol_analyzer.py](spectralis_vol_analyzer.py) · **Interactive notebook:** [Open in Google Colab](https://colab.research.google.com/github/farhadabedinzadeh/Spectralis-vol-analyzer/blob/main/notebooks/Spectralis_VOL_Public_Sample_Colab.ipynb) · [Notebook source](notebooks/Spectralis_VOL_Public_Sample_Colab.ipynb)
+
+The notebook demonstrates the pipeline using [EyePy's public `healthy_OS.vol` dataset](https://github.com/MedVisBonn/eyepydata/releases/tag/v1.0.0); no private clinical data are included.
+
+
 
 
 ## Overview
@@ -58,6 +62,20 @@ ILM–BM retinal thickness map
 Plots + numerical data + reports
 ```
 
+
+## Example results — public healthy-eye OCT
+
+The six example figures below were generated from the publicly available [EyePy healthy left-eye OCT volume](https://github.com/MedVisBonn/eyepydata/releases/tag/v1.0.0) (`healthy_OS.vol`). They are demonstration outputs, **not clinically validated measurements**. Inspect segmentation quality, orientation and the detected fovea before scientific interpretation.
+
+| Representative B-scans | ILM/BM segmentation overlay |
+|:---:|:---:|
+| ![Representative OCT B-scans](examples/healthy_OS/figures/02_representative_bscans.png) | ![Retinal layer segmentation overlay](examples/healthy_OS/figures/04_segmentation_overlay.png) |
+| **Retinal thickness map** | **Thickness on NIR localizer** |
+| ![ILM-to-BM retinal thickness map](examples/healthy_OS/figures/06_retinal_thickness_map.png) | ![Retinal thickness registered onto NIR localizer](examples/healthy_OS/figures/07_retinal_thickness_on_nir.png) |
+| **Foveal-pit localisation** | **ETDRS retinal thickness report** |
+| ![Automated foveal candidate in an OCT B-scan](examples/healthy_OS/figures/12_fovea_bscan.png) | ![Nine-sector ETDRS retinal thickness report](examples/healthy_OS/figures/13_etdrs_retinal_thickness_report.png) |
+
+**Dataset credit:** Sample OCT data from [MedVisBonn/eyepydata](https://github.com/MedVisBonn/eyepydata), with the original release acknowledgements to the researchers and clinical contributors. The original `.vol` file is intentionally **not redistributed** in this repository; the Colab notebook downloads it from the upstream release.
 
 ## Features
 
@@ -712,12 +730,28 @@ vol_outputs/
 
 </details>
 
+## Repository structure
+
+```text
+Spectralis-vol-analyzer/
+├── spectralis_vol_analyzer.py      # Main processing pipeline
+├── notebooks/
+│   └── Spectralis_VOL_Public_Sample_Colab.ipynb
+├── examples/
+│   └── healthy_OS/
+│       └── figures/               # Six public-data demonstration plots
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
 ## Installation
 
 Python 3.10 or newer is recommended.
 
 ```bash
-pip install eyepy scipy scikit-image imageio matplotlib numpy
+pip install -r requirements.txt
 ```
 
 The pipeline has primarily been designed around:
@@ -742,6 +776,8 @@ The output directory is defined as:
 ```python
 OUTPUT_ROOT = INPUT_DIR / "vol_outputs"
 ```
+
+The script defaults to `/content/vol_samples`, which is the sample-data folder used by the Colab notebook. For local use, change `INPUT_DIR` at the top of `spectralis_vol_analyzer.py` to the directory containing your `.vol` files, or run the [Colab notebook](https://colab.research.google.com/github/farhadabedinzadeh/Spectralis-vol-analyzer/blob/main/notebooks/Spectralis_VOL_Public_Sample_Colab.ipynb), which downloads the public dataset automatically.
 
 Then run:
 
