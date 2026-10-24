@@ -6,6 +6,8 @@ The pipeline loads OCT volumes with [EyePy](https://github.com/MedVisBonn/eyepy)
 
 The main goal is to provide a **transparent, reproducible starting point for OCT research**, particularly for studies involving retinal morphology, macular thickness, longitudinal imaging, and myopia.
 
+**Repository status:** The Python implementation described below has not yet been added to this repository. The installation and usage examples will be runnable once `spectralis_vol_analyzer.py` is committed.
+
 ---
 
 ## Overview
@@ -59,9 +61,9 @@ Plots + numerical data + reports
 
 ---
 
-# Features
+## Features
 
-## 1. Batch processing of Heidelberg `.vol` files
+### 1. Batch processing of Heidelberg `.vol` files
 
 The script automatically finds every `.vol` file in an input directory and processes them independently.
 
@@ -75,7 +77,7 @@ Recursive folder searching can optionally be enabled.
 
 ---
 
-## 2. OCT volume inspection
+### 2. OCT volume inspection
 
 For each file, the pipeline reports the OCT volume shape as:
 
@@ -116,7 +118,7 @@ Many B-scans acquired across the retina
 
 ---
 
-# Physical OCT Geometry
+## Physical OCT Geometry
 
 The pipeline reads the physical spacing supplied by the Heidelberg file:
 
@@ -128,29 +130,29 @@ scale_z → spacing between B-scans
 
 These values are used to calculate the physical dimensions of the scan.
 
-For an image dimension containing \(N\) samples with spacing \(s\), two related quantities are reported:
+For an image dimension containing $N$ samples with spacing $s$, two related quantities are reported:
 
-\[
+```math
 \text{pixel-covered extent}=N\,s
-\]
+```
 
 and
 
-\[
+```math
 \text{first-to-last sample distance}=(N-1)s
-\]
+```
 
 The pipeline also independently checks the stored B-scan coordinates against the header spacing and reports substantial disagreements.
 
 ---
 
-# B-scan Export and Visualisation
+## B-scan Export and Visualisation
 
 Every B-scan can be exported at its native resolution as a lossless PNG.
 
 The pipeline also generates:
 
-### Representative B-scans
+#### Representative B-scans
 
 ```text
 First B-scan
@@ -158,7 +160,7 @@ Middle B-scan
 Last B-scan
 ```
 
-### Complete B-scan grids
+#### Complete B-scan grids
 
 All B-scans are displayed in paginated overview figures.
 
@@ -173,7 +175,7 @@ This allows rapid visual inspection of:
 
 ---
 
-# NIR / SLO Localizer
+## NIR / SLO Localizer
 
 If available, the native NIR localizer is exported.
 
@@ -191,7 +193,7 @@ The Heidelberg convention that **B-scan index 0 is commonly the inferior-most sc
 
 ---
 
-# Retinal Layer Segmentation
+## Retinal Layer Segmentation
 
 The pipeline detects which retinal boundaries actually contain valid segmentation data.
 
@@ -212,19 +214,19 @@ BM       shape=(25, 1024)   coverage=98.4%
 
 Coverage is calculated as:
 
-\[
+```math
 \text{coverage}
 =
 \frac{\text{number of finite segmentation values}}
      {\text{total number of A-scan positions}}
 \times 100
-\]
+```
 
 Layer slots containing only missing values are ignored.
 
 ---
 
-# Segmentation Overlay
+## Segmentation Overlay
 
 Available retinal boundaries can be plotted directly over a B-scan.
 
@@ -239,13 +241,13 @@ This provides a visual QC step before thickness measurements are interpreted.
 
 ---
 
-# Retinal Thickness Map
+## Retinal Thickness Map
 
 When both the **inner limiting membrane (ILM)** and **Bruch's membrane (BM)** are available, total retinal thickness is calculated at every A-scan.
 
-For B-scan \(b\) and A-scan \(a\):
+For B-scan $b$ and A-scan $a$:
 
-\[
+```math
 T(b,a)
 =
 \left[
@@ -253,7 +255,7 @@ BM(b,a)-ILM(b,a)
 \right]
 \times scale_y
 \times 1000
-\]
+```
 
 where:
 
@@ -278,9 +280,9 @@ Invalid or non-positive thickness values are stored as `NaN` rather than being a
 
 ---
 
-# Fovea Localisation
+## Fovea Localisation
 
-## Current approach
+### Current approach
 
 The current implementation defines the foveal-pit candidate as the **minimum of the smoothed ILM-to-BM retinal thickness map**.
 
@@ -294,7 +296,7 @@ the middle A-scan
 
 Instead, it searches across the acquired macular volume.
 
-### Algorithm
+#### Algorithm
 
 ```text
 ILM + BM segmentation
@@ -341,18 +343,18 @@ to reduce the chance that segmentation errors near the acquisition boundary are 
 
 The detected location is therefore:
 
-\[
+```math
 (b_f,a_f)
 =
 \operatorname*{arg\,min}_{b,a}
 \tilde{T}(b,a)
-\]
+```
 
-where \(\tilde{T}\) is the smoothed retinal thickness map.
+where $\tilde{T}$ is the smoothed retinal thickness map.
 
 ---
 
-## Foveal measurements
+### Foveal measurements
 
 After localisation, the pipeline reports:
 
@@ -372,19 +374,19 @@ position on the NIR localizer
 
 Pit contrast is defined as:
 
-\[
+```math
 \text{Pit contrast}
 =
 \text{mean inner-ring thickness}
 -
 \text{smoothed foveal minimum}
-\]
+```
 
 A weak pit generates a warning rather than being silently treated as unquestionably valid.
 
 ---
 
-# Why the Fovea Algorithm Is a Baseline
+## Why the Fovea Algorithm Is a Baseline
 
 The minimum-thickness approach is simple, interpretable, and useful when ILM and BM segmentations are reliable.
 
@@ -440,7 +442,7 @@ This distinction is important: the current implementation provides an interpreta
 
 ---
 
-# ETDRS Retinal Thickness Analysis
+## ETDRS Retinal Thickness Analysis
 
 An ETDRS grid is centred on the detected fovea.
 
@@ -454,9 +456,9 @@ The standard diameters are:
 
 corresponding to radii:
 
-\[
+```math
 0.5,\ 1.5,\ 3.0\text{ mm}
-\]
+```
 
 The grid contains nine regions:
 
@@ -487,7 +489,7 @@ No missing values are interpolated.
 
 ---
 
-# ETDRS Measurements
+## ETDRS Measurements
 
 For every ETDRS region the pipeline calculates:
 
@@ -503,7 +505,7 @@ fraction of the region contained inside the scan
 
 Retinal volume is calculated directly from the original thickness samples:
 
-\[
+```math
 V
 =
 \sum_i
@@ -511,19 +513,19 @@ V
 \frac{T_i}{1000}
 \right)
 A_{\text{pixel}}
-\]
+```
 
 with:
 
-\[
+```math
 A_{\text{pixel}}
 =
 scale_x \times scale_z
-\]
+```
 
 Therefore:
 
-\[
+```math
 V
 =
 \sum_i
@@ -531,7 +533,7 @@ V
 \frac{T_i}{1000}
 \right)
 scale_x\,scale_z
-\]
+```
 
 where thickness is converted from µm to mm.
 
@@ -541,11 +543,11 @@ Instead, incomplete coverage is reported explicitly.
 
 ---
 
-# ETDRS Report Figure
+## ETDRS Report Figure
 
 The pipeline generates a two-panel ETDRS report.
 
-### Left panel
+#### Left panel
 
 ```text
 Native NIR localizer
@@ -557,7 +559,7 @@ detected fovea
 1 / 3 / 6 mm ETDRS grid
 ```
 
-### Right panel
+#### Right panel
 
 A nine-sector ETDRS diagram displaying:
 
@@ -580,7 +582,7 @@ overall coverage
 
 ---
 
-# OCT Depth Projections
+## OCT Depth Projections
 
 The OCT intensity volume can also be projected along the depth axis.
 
@@ -618,7 +620,7 @@ These projections are derived from structural OCT and should **not** be interpre
 
 ---
 
-# En-face Slab Projections
+## En-face Slab Projections
 
 When both required layer boundaries are available, EyePy-defined slab projections can also be generated.
 
@@ -628,7 +630,7 @@ The resulting arrays are saved numerically as well as displayed as images.
 
 ---
 
-# OCT Acquisition Quality
+## OCT Acquisition Quality
 
 When the `.vol` file contains per-B-scan acquisition-quality values, the pipeline:
 
@@ -641,7 +643,7 @@ This can help identify local acquisition degradation or motion-related problems.
 
 ---
 
-# OCT Intensity Distribution
+## OCT Intensity Distribution
 
 The pipeline plots the OCT intensity histogram using a logarithmic count axis.
 
@@ -649,7 +651,7 @@ Zero-valued voxels are excluded from the histogram because large amounts of zero
 
 ---
 
-# Outputs
+## Outputs
 
 For each `.vol` file, the pipeline creates a structured output directory:
 
@@ -701,7 +703,7 @@ vol_outputs/
 
 ---
 
-# Installation
+## Installation
 
 Python 3.10 or newer is recommended.
 
@@ -717,7 +719,7 @@ eyepy >= 0.21
 
 ---
 
-# Usage
+## Usage
 
 Set the directory containing the `.vol` files:
 
@@ -747,7 +749,7 @@ results = run_batch()
 
 ---
 
-# Configuration
+## Configuration
 
 Several behaviours can be controlled near the beginning of the script.
 
@@ -771,9 +773,9 @@ MIN_ETDRS_COVERAGE = 0.95
 
 ---
 
-# Important Methodological Notes
+## Important Methodological Notes
 
-## Structural OCT, not OCTA
+### Structural OCT, not OCTA
 
 The depth projections generated from the OCT intensity volume are structural OCT projections.
 
@@ -781,7 +783,7 @@ They should not be interpreted as vascular OCTA maps.
 
 ---
 
-## Missing data
+### Missing data
 
 Missing segmentation values are represented as `NaN`.
 
@@ -789,7 +791,7 @@ They are not filled when calculating thickness, foveal measurements, ETDRS stati
 
 ---
 
-## Physical scale
+### Physical scale
 
 The `.vol` file supplies device-based lateral and axial scaling.
 
@@ -801,13 +803,13 @@ This distinction may be particularly relevant for highly myopic eyes.
 
 ---
 
-## Retinal thickness direction
+### Retinal thickness direction
 
 Current retinal thickness is calculated along the OCT axial/image-column direction:
 
-\[
+```math
 BM_y-ILM_y
-\]
+```
 
 This is not necessarily identical to the shortest surface-normal distance between ILM and BM.
 
@@ -815,7 +817,7 @@ For ordinary macular imaging this may be a reasonable approximation, but surface
 
 ---
 
-# Research Context
+## Research Context
 
 This pipeline was developed as part of exploratory OCT analysis for research involving retinal imaging and quantitative macular morphology.
 
@@ -836,7 +838,7 @@ The current focus is on transparent and interpretable feature extraction rather 
 
 ---
 
-# Future Development
+## Future Development
 
 Planned or possible extensions include:
 
@@ -890,21 +892,21 @@ When axial length is available, lateral OCT dimensions could be corrected for oc
 
 Repeated visits could be registered and compared using:
 
-\[
+```math
 \Delta T=T_{t_2}-T_{t_1}
-\]
+```
 
 and, where axial length is available:
 
-\[
+```math
 \Delta AL=AL_{t_2}-AL_{t_1}
-\]
+```
 
 to investigate structural changes over time.
 
 ---
 
-# Reproducibility
+## Reproducibility
 
 The pipeline intentionally saves both figures and underlying numerical arrays.
 
@@ -918,7 +920,7 @@ This makes it possible to:
 
 ---
 
-# Limitations
+## Limitations
 
 This repository should currently be considered a **research and exploratory analysis tool**, not a clinical diagnostic system.
 
@@ -937,7 +939,7 @@ Automatic fovea localisation should therefore be visually reviewed, particularly
 
 ---
 
-# Dependencies
+## Dependencies
 
 Core Python packages:
 
@@ -952,7 +954,7 @@ eyepy
 
 ---
 
-# Acknowledgements
+## Acknowledgements
 
 This project uses **EyePy**, an open-source Python library for ophthalmic imaging developed by the Medical Image Analysis Group at the University of Bonn.
 
@@ -960,7 +962,7 @@ EyePy provides support for loading and working with Heidelberg ophthalmic imagin
 
 ---
 
-# Disclaimer
+## Disclaimer
 
 This software is intended for **research use only**.
 
@@ -968,7 +970,7 @@ It is not a medical device and must not be used as a substitute for clinical int
 
 ---
 
-## Citation
+### Citation
 
 If you use this repository in academic work, please cite the repository and the relevant EyePy publications/software release.
 
