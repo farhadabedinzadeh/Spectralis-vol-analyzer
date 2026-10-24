@@ -346,7 +346,7 @@ The detected location is therefore:
 ```math
 (b_f,a_f)
 =
-\operatorname*{arg\,min}_{b,a}
+\underset{b,a}{\mathrm{arg\,min}}
 \tilde{T}(b,a)
 ```
 
